@@ -15,92 +15,94 @@ function LoginBG() {
     window.addEventListener('resize', onResize)
 
     /* Particles */
-    type P = {x:number;y:number;vx:number;vy:number;r:number;opacity:number;pulse:number}
-    const particles: P[] = Array.from({length: 70}, () => ({
-      x: Math.random()*W, y: Math.random()*H,
-      vx: (Math.random()-.5)*0.4, vy: (Math.random()-.5)*0.4,
-      r: Math.random()*1.8+0.4,
-      opacity: Math.random()*0.5+0.1,
-      pulse: Math.random()*Math.PI*2,
+    type P = { x: number; y: number; vx: number; vy: number; r: number; opacity: number; pulse: number }
+    const particles: P[] = Array.from({ length: 70 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - .5) * 0.4, vy: (Math.random() - .5) * 0.4,
+      r: Math.random() * 1.8 + 0.4,
+      opacity: Math.random() * 0.5 + 0.1,
+      pulse: Math.random() * Math.PI * 2,
     }))
 
     /* Floating orbs */
-    type Orb = {x:number;y:number;r:number;vx:number;vy:number;hue:number;phase:number}
+    type Orb = { x: number; y: number; r: number; vx: number; vy: number; hue: number; phase: number }
     const orbs: Orb[] = [
-      {x:W*0.15, y:H*0.3,  r:180, vx:0.15, vy:0.08, hue:145, phase:0},
-      {x:W*0.85, y:H*0.7,  r:220, vx:-0.12, vy:0.1, hue:190, phase:1},
-      {x:W*0.5,  y:H*0.85, r:150, vx:0.1,  vy:-0.15, hue:160, phase:2},
+      { x: W * 0.15, y: H * 0.3, r: 180, vx: 0.15, vy: 0.08, hue: 145, phase: 0 },
+      { x: W * 0.85, y: H * 0.7, r: 220, vx: -0.12, vy: 0.1, hue: 190, phase: 1 },
+      { x: W * 0.5, y: H * 0.85, r: 150, vx: 0.1, vy: -0.15, hue: 160, phase: 2 },
     ]
 
     let t = 0, frame: number
 
     function draw() {
-      ctx.clearRect(0,0,W,H)
+      ctx.clearRect(0, 0, W, H)
       t += 0.008
 
       /* Orb blobs */
       orbs.forEach(o => {
         o.x += o.vx; o.y += o.vy
-        if(o.x < -o.r || o.x > W+o.r) o.vx *= -1
-        if(o.y < -o.r || o.y > H+o.r) o.vy *= -1
+        if (o.x < -o.r || o.x > W + o.r) o.vx *= -1
+        if (o.y < -o.r || o.y > H + o.r) o.vy *= -1
         const pulse = Math.sin(t + o.phase) * 0.2 + 0.8
-        const gr = ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r*pulse)
+        const gr = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r * pulse)
         gr.addColorStop(0, `hsla(${o.hue},100%,60%,0.055)`)
         gr.addColorStop(0.5, `hsla(${o.hue},100%,50%,0.025)`)
         gr.addColorStop(1, 'transparent')
-        ctx.fillStyle = gr; ctx.fillRect(0,0,W,H)
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H)
       })
 
       /* Particles */
       particles.forEach(p => {
         p.x += p.vx; p.y += p.vy; p.pulse += 0.025
-        if(p.x < 0) p.x = W; if(p.x > W) p.x = 0
-        if(p.y < 0) p.y = H; if(p.y > H) p.y = 0
-        const alpha = p.opacity * (Math.sin(p.pulse)*0.3+0.7)
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0
+        const alpha = p.opacity * (Math.sin(p.pulse) * 0.3 + 0.7)
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(0,255,136,${alpha})`
         ctx.fill()
       })
 
       /* Connection lines */
-      for(let i=0;i<particles.length;i++) {
-        for(let j=i+1;j<particles.length;j++) {
-          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y
-          const d=Math.sqrt(dx*dx+dy*dy)
-          if(d<110) {
-            ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y)
-            ctx.strokeStyle=`rgba(0,255,136,${0.08*(1-d/110)})`; ctx.lineWidth=0.6; ctx.stroke()
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y
+          const d = Math.sqrt(dx * dx + dy * dy)
+          if (d < 110) {
+            ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y)
+            ctx.strokeStyle = `rgba(0,255,136,${0.08 * (1 - d / 110)})`; ctx.lineWidth = 0.6; ctx.stroke()
           }
         }
       }
 
       /* Scan lines */
       const scanY = ((t * 80) % (H + 100)) - 50
-      const sg = ctx.createLinearGradient(0,scanY-30,0,scanY+30)
-      sg.addColorStop(0,'transparent'); sg.addColorStop(0.5,'rgba(0,255,136,0.04)'); sg.addColorStop(1,'transparent')
-      ctx.fillStyle=sg; ctx.fillRect(0,scanY-30,W,60)
+      const sg = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30)
+      sg.addColorStop(0, 'transparent'); sg.addColorStop(0.5, 'rgba(0,255,136,0.04)'); sg.addColorStop(1, 'transparent')
+      ctx.fillStyle = sg; ctx.fillRect(0, scanY - 30, W, 60)
 
       /* HEX grid subtle */
-      const HEX = 44, HW = HEX*Math.sqrt(3)
-      const cols2 = Math.ceil(W/HW)+2, rows2 = Math.ceil(H/HEX)+2
-      for(let row=-1;row<rows2;row++){for(let col=-1;col<cols2;col++){
-        const x=col*HW+(row%2)*HW/2, y=row*HEX*1.5
-        ctx.beginPath()
-        for(let k=0;k<6;k++){const a=Math.PI/3*k-Math.PI/6; k===0?ctx.moveTo(x+HEX*0.42*Math.cos(a),y+HEX*0.42*Math.sin(a)):ctx.lineTo(x+HEX*0.42*Math.cos(a),y+HEX*0.42*Math.sin(a))}
-        ctx.closePath(); ctx.strokeStyle='rgba(0,255,136,0.028)'; ctx.lineWidth=0.5; ctx.stroke()
-      }}
+      const HEX = 44, HW = HEX * Math.sqrt(3)
+      const cols2 = Math.ceil(W / HW) + 2, rows2 = Math.ceil(H / HEX) + 2
+      for (let row = -1; row < rows2; row++) {
+        for (let col = -1; col < cols2; col++) {
+          const x = col * HW + (row % 2) * HW / 2, y = row * HEX * 1.5
+          ctx.beginPath()
+          for (let k = 0; k < 6; k++) { const a = Math.PI / 3 * k - Math.PI / 6; k === 0 ? ctx.moveTo(x + HEX * 0.42 * Math.cos(a), y + HEX * 0.42 * Math.sin(a)) : ctx.lineTo(x + HEX * 0.42 * Math.cos(a), y + HEX * 0.42 * Math.sin(a)) }
+          ctx.closePath(); ctx.strokeStyle = 'rgba(0,255,136,0.028)'; ctx.lineWidth = 0.5; ctx.stroke()
+        }
+      }
 
       /* Vignette */
-      const vig = ctx.createRadialGradient(W/2,H/2,H*0.1,W/2,H/2,H*0.85)
-      vig.addColorStop(0,'transparent'); vig.addColorStop(1,'rgba(3,4,8,0.6)')
-      ctx.fillStyle=vig; ctx.fillRect(0,0,W,H)
+      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.1, W / 2, H / 2, H * 0.85)
+      vig.addColorStop(0, 'transparent'); vig.addColorStop(1, 'rgba(3,4,8,0.6)')
+      ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H)
 
       frame = requestAnimationFrame(draw)
     }
     draw()
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize',onResize) }
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', onResize) }
   }, [])
-  return <canvas ref={ref} style={{position:'fixed',inset:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:0}}/>
+  return <canvas ref={ref} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} />
 }
 
 /* ── FLOATING CODE SNIPPETS (decorative) ── */
@@ -116,19 +118,19 @@ function FloatingCode() {
     'hash = bcrypt.hashpw(pwd, salt)',
   ]
   return (
-    <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none',overflow:'hidden'}}>
-      {snippets.map((s,i)=>(
+    <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+      {snippets.map((s, i) => (
         <div key={i} style={{
-          position:'absolute',
-          left:`${5 + (i*12)%85}%`,
-          top:`${8 + (i*17)%80}%`,
-          fontSize:'10px',
-          fontFamily:"'JetBrains Mono',monospace",
-          color:'rgba(0,255,136,0.07)',
-          whiteSpace:'nowrap',
-          animation:`float${i%3} ${8+i%4}s ease infinite`,
-          animationDelay:`${i*0.7}s`,
-          transform:`rotate(${-15+i*5}deg)`,
+          position: 'absolute',
+          left: `${5 + (i * 12) % 85}%`,
+          top: `${8 + (i * 17) % 80}%`,
+          fontSize: '10px',
+          fontFamily: "'JetBrains Mono',monospace",
+          color: 'rgba(0,255,136,0.07)',
+          whiteSpace: 'nowrap',
+          animation: `float${i % 3} ${8 + i % 4}s ease infinite`,
+          animationDelay: `${i * 0.7}s`,
+          transform: `rotate(${-15 + i * 5}deg)`,
         }}>{s}</div>
       ))}
     </div>
@@ -138,37 +140,37 @@ function FloatingCode() {
 /* ── MAIN ── */
 export default function LoginPage() {
   const router = useRouter()
-  const [email,setEmail]       = useState('')
-  const [password,setPassword] = useState('')
-  const [showPw,setShowPw]     = useState(false)
-  const [isSignUp,setIsSignUp] = useState(false)
-  const [loading,setLoading]   = useState(false)
-  const [message,setMessage]   = useState<{type:'error'|'success';text:string}|null>(null)
-  const [mounted,setMounted]   = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPw, setShowPw] = useState(false)
+  const [isSignUp, setIsSignUp] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
+  const [mounted, setMounted] = useState(false)
 
-  useEffect(()=>{ setTimeout(()=>setMounted(true),100) },[])
+  useEffect(() => { setTimeout(() => setMounted(true), 100) }, [])
 
   const handleAuth = async () => {
-    if(!email||!password){setMessage({type:'error',text:'Please fill in all fields'});return}
+    if (!email || !password) { setMessage({ type: 'error', text: 'Please fill in all fields' }); return }
     setLoading(true); setMessage(null)
     try {
-      if(isSignUp){
-        const {error}=await supabase.auth.signUp({email,password})
-        if(error) setMessage({type:'error',text:error.message})
-        else setMessage({type:'success',text:'Account created! Check your email or sign in directly.'})
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({ email, password })
+        if (error) setMessage({ type: 'error', text: error.message })
+        else setMessage({ type: 'success', text: 'Account created! Check your email or sign in directly.' })
       } else {
-        const {error}=await supabase.auth.signInWithPassword({email,password})
-        if(error) setMessage({type:'error',text:error.message})
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) setMessage({ type: 'error', text: error.message })
         else router.push('/scan')
       }
-    } catch { setMessage({type:'error',text:'Something went wrong'}) }
+    } catch { setMessage({ type: 'error', text: 'Something went wrong' }) }
     setLoading(false)
   }
 
   const handleForgot = async () => {
-    if(!email){setMessage({type:'error',text:'Enter your email above first'});return}
-    const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:`${window.location.origin}/scan`})
-    setMessage(error?{type:'error',text:error.message}:{type:'success',text:'Password reset email sent!'})
+    if (!email) { setMessage({ type: 'error', text: 'Enter your email above first' }); return }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/scan` })
+    setMessage(error ? { type: 'error', text: error.message } : { type: 'success', text: 'Password reset email sent!' })
   }
 
   return (
@@ -214,7 +216,7 @@ export default function LoginPage() {
         .ping2{animation-delay:1s;}.ping3{animation-delay:2s;}
 
         /* LOGIN CARD */
-        .card{position:relative;z-index:10;width:100%;max-width:460px;background:rgba(8,10,18,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:40px;backdrop-filter:blur(40px);box-shadow:0 40px 120px rgba(0,0,0,0.8),0 0 60px rgba(0,255,136,0.04);animation:${mounted?'cardPop 0.6s cubic-bezier(0.34,1.4,0.64,1) both':'none'};overflow:hidden;}
+        .card{position:relative;z-index:10;width:100%;max-width:460px;background:rgba(8,10,18,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:40px;backdrop-filter:blur(40px);box-shadow:0 40px 120px rgba(0,0,0,0.8),0 0 60px rgba(0,255,136,0.04);animation:${mounted ? 'cardPop 0.6s cubic-bezier(0.34,1.4,0.64,1) both' : 'none'};overflow:hidden;}
         .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,0.4),transparent);}
         .card-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,0.25),transparent);animation:scanLine 4s ease infinite;}
 
@@ -269,26 +271,28 @@ export default function LoginPage() {
         @media(max-width:500px){.card{padding:28px 22px;}.card-title{font-size:24px;}}
       `}</style>
 
-      <LoginBG/>
-      <FloatingCode/>
+      <LoginBG />
+      <FloatingCode />
 
       {/* Back button */}
-      <button className="back-btn" onClick={()=>router.push('/')}>← Back</button>
+      <button className="back-btn" onClick={() => router.push('/')}>← Back</button>
 
-      {/* Left branding panel — FIXED: removed extra wrapping <div> that was breaking vertical centering */}
+      {/* Left branding panel */}
       <div className="left-brand">
-        <div className="brand-logo">
-          <div className="brand-icon">🛡</div>
-          <span className="brand-name">Cyber<span style={{color:'#00ff88'}}>Sentry</span> <span style={{fontSize:'12px',background:'rgba(0,255,136,0.1)',border:'1px solid rgba(0,255,136,0.25)',color:'#00ff88',padding:'2px 8px',borderRadius:'20px',fontWeight:700,verticalAlign:'middle'}}>AI</span></span>
-        </div>
-        <div className="brand-tagline">
-          Secure your code<br/>with <span className="g">AI-powered</span><br/>intelligence
+        <div>
+          <div className="brand-logo">
+            <div className="brand-icon">🛡</div>
+            <span className="brand-name">Cyber<span style={{ color: '#00ff88' }}>Sentry</span> <span style={{ fontSize: '12px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)', color: '#00ff88', padding: '2px 8px', borderRadius: '20px', fontWeight: 700, verticalAlign: 'middle' }}>AI</span></span>
+          </div>
+          <div className="brand-tagline">
+            Secure your code<br />with <span className="g">AI-powered</span><br />intelligence
+          </div>
         </div>
         <div className="brand-sub">
-          Autonomous agent that scans, reasons,<br/>patches and verifies your code instantly.
+          Autonomous agent that scans, reasons, patches and verifies your code instantly.
         </div>
         <div className="stats-row">
-          {[{n:'OWASP',l:'Top 10'},{n:'96/100',l:'Max Score'},{n:'<5s',l:'Scan Time'},{n:'9 langs',l:'Supported'}].map((s,i)=>(
+          {[{ n: 'OWASP', l: 'Top 10' }, { n: '96/100', l: 'Max Score' }, { n: '<5s', l: 'Scan Time' }, { n: '9 langs', l: 'Supported' }].map((s, i) => (
             <div className="stat-chip" key={i}>
               <div className="stat-n">{s.n}</div>
               <div className="stat-l">{s.l}</div>
@@ -296,23 +300,23 @@ export default function LoginPage() {
           ))}
         </div>
         <div className="radar-deco">
-          <div className="ping"/><div className="ping ping2"/><div className="ping ping3"/>
+          <div className="ping" /><div className="ping ping2" /><div className="ping ping3" />
         </div>
       </div>
 
       {/* Login card */}
-      <div className="page" style={{justifyContent:'flex-end',paddingRight:'8vw'}}>
+      <div className="page" style={{ justifyContent: 'flex-end', paddingRight: '8vw' }}>
         <div className="card">
-          <div className="card-scan" style={{top: 0}}/>
+          <div className="card-scan" style={{ top: 0 }} />
 
           <div className="card-logo">
             <div className="cico">🛡</div>
-            <span className="cname">Cyber<span style={{color:'#00ff88'}}>Sentry</span></span>
-            <span style={{fontSize:'11px',background:'rgba(0,255,136,0.08)',border:'1px solid rgba(0,255,136,0.2)',color:'#00ff88',padding:'2px 8px',borderRadius:'20px',fontWeight:700,marginLeft:'4px',fontFamily:"'JetBrains Mono',monospace"}}>AI</span>
+            <span className="cname">Cyber<span style={{ color: '#00ff88' }}>Sentry</span></span>
+            <span style={{ fontSize: '11px', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', color: '#00ff88', padding: '2px 8px', borderRadius: '20px', fontWeight: 700, marginLeft: '4px', fontFamily: "'JetBrains Mono',monospace" }}>AI</span>
           </div>
 
-          <div className="card-title">{isSignUp?'Create Account':'Welcome Back'}</div>
-          <div className="card-sub">{isSignUp?'Start securing your codebase today':'Continue securing your codebase'}</div>
+          <div className="card-title">{isSignUp ? 'Create Account' : 'Welcome Back'}</div>
+          <div className="card-sub">{isSignUp ? 'Start securing your codebase today' : 'Continue securing your codebase'}</div>
 
           <div className="sec-badges">
             <span className="sec-badge">🔐 SSL Encrypted</span>
@@ -320,9 +324,9 @@ export default function LoginPage() {
             <span className="sec-badge">⚡ Instant Access</span>
           </div>
 
-          {message&&(
-            <div className={`msg ${message.type==='error'?'msg-error':'msg-success'}`}>
-              <span>{message.type==='error'?'⚠️':'✅'}</span>
+          {message && (
+            <div className={`msg ${message.type === 'error' ? 'msg-error' : 'msg-success'}`}>
+              <span>{message.type === 'error' ? '⚠️' : '✅'}</span>
               <span>{message.text}</span>
             </div>
           )}
@@ -330,37 +334,37 @@ export default function LoginPage() {
           <div className="field">
             <label className="field-label">Email</label>
             <div className="input-wrap">
-              <input className="field-input" type="email" value={email} onChange={e=>setEmail(e.target.value)}
-                onKeyDown={e=>e.key==='Enter'&&handleAuth()} placeholder="you@example.com"/>
+              <input className="field-input" type="email" value={email} onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAuth()} placeholder="you@example.com" />
             </div>
           </div>
 
           <div className="field">
             <label className="field-label">Password</label>
             <div className="input-wrap">
-              <input className="field-input" type={showPw?'text':'password'} value={password}
-                onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleAuth()}
-                placeholder="••••••••" style={{paddingRight:'48px'}}/>
-              <button className="pw-toggle" onClick={()=>setShowPw(p=>!p)}>{showPw?'🙈':'👁'}</button>
+              <input className="field-input" type={showPw ? 'text' : 'password'} value={password}
+                onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAuth()}
+                placeholder="••••••••" style={{ paddingRight: '48px' }} />
+              <button className="pw-toggle" onClick={() => setShowPw(p => !p)}>{showPw ? '🙈' : '👁'}</button>
             </div>
           </div>
 
-          {!isSignUp&&<button className="forgot" onClick={handleForgot}>Forgot password?</button>}
+          {!isSignUp && <button className="forgot" onClick={handleForgot}>Forgot password?</button>}
 
           <button className="submit-btn" onClick={handleAuth} disabled={loading}>
-            {loading?<><span className="spinner"/>Processing...</>:<>{isSignUp?'Create Account →':'Sign In →'}</>}
+            {loading ? <><span className="spinner" />Processing...</> : <>{isSignUp ? 'Create Account →' : 'Sign In →'}</>}
           </button>
 
-          <div className="divider"><div className="divider-line"/><div className="divider-text">or</div><div className="divider-line"/></div>
+          <div className="divider"><div className="divider-line" /><div className="divider-text">or</div><div className="divider-line" /></div>
 
-          <button className="skip-btn" onClick={()=>router.push('/scan')}>
+          <button className="skip-btn" onClick={() => router.push('/scan')}>
             👁 Skip — View Demo (No account needed)
           </button>
 
           <div className="toggle-mode">
-            {isSignUp?'Already have an account?':'Don\'t have an account?'}
-            <button className="toggle-link" onClick={()=>{setIsSignUp(p=>!p);setMessage(null)}}>
-              {isSignUp?'Sign In':'Sign Up'}
+            {isSignUp ? 'Already have an account?' : 'Don\'t have an account?'}
+            <button className="toggle-link" onClick={() => { setIsSignUp(p => !p); setMessage(null) }}>
+              {isSignUp ? 'Sign In' : 'Sign Up'}
             </button>
           </div>
         </div>
