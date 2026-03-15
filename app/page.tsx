@@ -14,6 +14,7 @@ function LoginBG() {
     const onResize = () => { W = c.width = window.innerWidth; H = c.height = window.innerHeight }
     window.addEventListener('resize', onResize)
 
+    /* Particles */
     type P = {x:number;y:number;vx:number;vy:number;r:number;opacity:number;pulse:number}
     const particles: P[] = Array.from({length: 70}, () => ({
       x: Math.random()*W, y: Math.random()*H,
@@ -23,6 +24,7 @@ function LoginBG() {
       pulse: Math.random()*Math.PI*2,
     }))
 
+    /* Floating orbs */
     type Orb = {x:number;y:number;r:number;vx:number;vy:number;hue:number;phase:number}
     const orbs: Orb[] = [
       {x:W*0.15, y:H*0.3,  r:180, vx:0.15, vy:0.08, hue:145, phase:0},
@@ -36,6 +38,7 @@ function LoginBG() {
       ctx.clearRect(0,0,W,H)
       t += 0.008
 
+      /* Orb blobs */
       orbs.forEach(o => {
         o.x += o.vx; o.y += o.vy
         if(o.x < -o.r || o.x > W+o.r) o.vx *= -1
@@ -48,6 +51,7 @@ function LoginBG() {
         ctx.fillStyle = gr; ctx.fillRect(0,0,W,H)
       })
 
+      /* Particles */
       particles.forEach(p => {
         p.x += p.vx; p.y += p.vy; p.pulse += 0.025
         if(p.x < 0) p.x = W; if(p.x > W) p.x = 0
@@ -58,6 +62,7 @@ function LoginBG() {
         ctx.fill()
       })
 
+      /* Connection lines */
       for(let i=0;i<particles.length;i++) {
         for(let j=i+1;j<particles.length;j++) {
           const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y
@@ -69,11 +74,13 @@ function LoginBG() {
         }
       }
 
+      /* Scan lines */
       const scanY = ((t * 80) % (H + 100)) - 50
       const sg = ctx.createLinearGradient(0,scanY-30,0,scanY+30)
       sg.addColorStop(0,'transparent'); sg.addColorStop(0.5,'rgba(0,255,136,0.04)'); sg.addColorStop(1,'transparent')
       ctx.fillStyle=sg; ctx.fillRect(0,scanY-30,W,60)
 
+      /* HEX grid subtle */
       const HEX = 44, HW = HEX*Math.sqrt(3)
       const cols2 = Math.ceil(W/HW)+2, rows2 = Math.ceil(H/HEX)+2
       for(let row=-1;row<rows2;row++){for(let col=-1;col<cols2;col++){
@@ -83,6 +90,7 @@ function LoginBG() {
         ctx.closePath(); ctx.strokeStyle='rgba(0,255,136,0.028)'; ctx.lineWidth=0.5; ctx.stroke()
       }}
 
+      /* Vignette */
       const vig = ctx.createRadialGradient(W/2,H/2,H*0.1,W/2,H/2,H*0.85)
       vig.addColorStop(0,'transparent'); vig.addColorStop(1,'rgba(3,4,8,0.6)')
       ctx.fillStyle=vig; ctx.fillRect(0,0,W,H)
@@ -185,44 +193,23 @@ export default function LoginPage() {
 
         .page{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;}
 
-        /* LEFT side branding — FIXED: proper centering & symmetry */
-        .left-brand{
-          position:fixed;
-          left:56px;
-          top:50%;
-          transform:translateY(-50%);
-          z-index:10;
-          max-width:420px;
-          width:38vw;
-          display:flex;
-          flex-direction:column;
-          gap:28px;
-          justify-content:center;
-          animation:fadeUp 0.8s ease 0.2s both;
-        }
-        .brand-logo{display:flex;align-items:center;gap:12px;}
-        .brand-icon{width:52px;height:52px;border-radius:16px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.25);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 0 40px rgba(0,255,136,0.15);flex-shrink:0;}
+        /* LEFT side branding */
+        .left-brand{position:fixed;left:56px;top:50%;transform:translateY(-50%);z-index:10;max-width:380px;display:flex;flex-direction:column;gap:24px;animation:fadeUp 0.8s ease 0.2s both;}
+        .brand-logo{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+        .brand-icon{width:52px;height:52px;border-radius:16px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.25);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 0 40px rgba(0,255,136,0.15);}
         .brand-name{font-size:26px;font-weight:900;letter-spacing:-0.03em;}
-        .brand-tagline{font-size:38px;font-weight:900;line-height:1.18;letter-spacing:-0.035em;color:white;}
+        .brand-tagline{font-size:36px;font-weight:900;line-height:1.15;letter-spacing:-0.035em;color:white;}
         .brand-tagline .g{background:linear-gradient(120deg,#00ff88,#00ccff,#00ff88);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerText 4s linear infinite;}
-
-        /* FIXED: removed <br/> reliance — text wraps naturally */
-        .brand-sub{
-          font-size:15px;
-          color:rgba(255,255,255,0.38);
-          line-height:1.75;
-          font-family:'JetBrains Mono',monospace;
-          max-width:340px;
-        }
+        .brand-sub{font-size:15px;color:rgba(255,255,255,0.35);line-height:1.7;font-family:'JetBrains Mono',monospace;max-width:320px;}
 
         /* Stats row */
-        .stats-row{display:flex;gap:12px;flex-wrap:wrap;}
-        .stat-chip{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 16px;text-align:center;min-width:72px;}
-        .stat-n{font-size:18px;font-weight:800;color:#00ff88;letter-spacing:-0.03em;}
-        .stat-l{font-size:10px;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;margin-top:3px;}
+        .stats-row{display:flex;gap:16px;flex-wrap:wrap;}
+        .stat-chip{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;text-align:center;}
+        .stat-n{font-size:20px;font-weight:800;color:#00ff88;letter-spacing:-0.03em;}
+        .stat-l{font-size:10px;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;margin-top:2px;}
 
         /* Radar decoration */
-        .radar-deco{position:relative;width:180px;height:180px;opacity:0.12;margin-top:-8px;}
+        .radar-deco{position:absolute;left:220px;bottom:-60px;width:180px;height:180px;opacity:0.12;}
         .ping{position:absolute;inset:0;border-radius:50%;border:1px solid #00ff88;animation:radarPing 3s ease-out infinite;}
         .ping2{animation-delay:1s;}.ping3{animation-delay:2s;}
 
@@ -270,9 +257,11 @@ export default function LoginPage() {
         .msg-error{background:rgba(255,68,102,0.08);border:1px solid rgba(255,68,102,0.22);color:#ff8899;}
         .msg-success{background:rgba(0,255,136,0.07);border:1px solid rgba(0,255,136,0.22);color:#00ff88;}
 
+        /* Security badges on card */
         .sec-badges{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
         .sec-badge{font-size:10px;background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.12);color:rgba(0,255,136,0.6);padding:3px 9px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
 
+        /* Back button */
         .back-btn{position:fixed;top:24px;left:24px;z-index:20;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-family:'Outfit',sans-serif;font-weight:600;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
         .back-btn:hover{background:rgba(255,255,255,0.09);color:white;}
 
@@ -288,25 +277,18 @@ export default function LoginPage() {
 
       {/* Left branding panel */}
       <div className="left-brand">
-        <div className="brand-logo">
-          <div className="brand-icon">🛡</div>
-          <span className="brand-name">
-            Cyber<span style={{color:'#00ff88'}}>Sentry</span>{' '}
-            <span style={{fontSize:'12px',background:'rgba(0,255,136,0.1)',border:'1px solid rgba(0,255,136,0.25)',color:'#00ff88',padding:'2px 8px',borderRadius:'20px',fontWeight:700,verticalAlign:'middle'}}>AI</span>
-          </span>
+        <div>
+          <div className="brand-logo">
+            <div className="brand-icon">🛡</div>
+            <span className="brand-name">Cyber<span style={{color:'#00ff88'}}>Sentry</span> <span style={{fontSize:'12px',background:'rgba(0,255,136,0.1)',border:'1px solid rgba(0,255,136,0.25)',color:'#00ff88',padding:'2px 8px',borderRadius:'20px',fontWeight:700,verticalAlign:'middle'}}>AI</span></span>
+          </div>
+          <div className="brand-tagline">
+            Secure your code<br/>with <span className="g">AI-powered</span><br/>intelligence
+          </div>
         </div>
-
-        <div className="brand-tagline">
-          Secure your code<br/>
-          with <span className="g">AI-powered</span><br/>
-          intelligence
-        </div>
-
-        {/* FIXED: no <br/> — wraps naturally */}
         <div className="brand-sub">
-          Autonomous agent that scans, reasons, patches and verifies your code instantly.
+          Autonomous agent that scans, reasons,<br/>patches and verifies your code instantly.
         </div>
-
         <div className="stats-row">
           {[{n:'OWASP',l:'Top 10'},{n:'96/100',l:'Max Score'},{n:'<5s',l:'Scan Time'},{n:'9 langs',l:'Supported'}].map((s,i)=>(
             <div className="stat-chip" key={i}>
@@ -315,7 +297,6 @@ export default function LoginPage() {
             </div>
           ))}
         </div>
-
         <div className="radar-deco">
           <div className="ping"/><div className="ping ping2"/><div className="ping ping3"/>
         </div>
