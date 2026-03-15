@@ -275,16 +275,14 @@ export default function LoginPage() {
       {/* Back button */}
       <button className="back-btn" onClick={()=>router.push('/')}>← Back</button>
 
-      {/* Left branding panel */}
+      {/* Left branding panel — FIXED: removed extra wrapping <div> that was breaking vertical centering */}
       <div className="left-brand">
-        <div>
-          <div className="brand-logo">
-            <div className="brand-icon">🛡</div>
-            <span className="brand-name">Cyber<span style={{color:'#00ff88'}}>Sentry</span> <span style={{fontSize:'12px',background:'rgba(0,255,136,0.1)',border:'1px solid rgba(0,255,136,0.25)',color:'#00ff88',padding:'2px 8px',borderRadius:'20px',fontWeight:700,verticalAlign:'middle'}}>AI</span></span>
-          </div>
-          <div className="brand-tagline">
-            Secure your code<br/>with <span className="g">AI-powered</span><br/>intelligence
-          </div>
+        <div className="brand-logo">
+          <div className="brand-icon">🛡</div>
+          <span className="brand-name">Cyber<span style={{color:'#00ff88'}}>Sentry</span> <span style={{fontSize:'12px',background:'rgba(0,255,136,0.1)',border:'1px solid rgba(0,255,136,0.25)',color:'#00ff88',padding:'2px 8px',borderRadius:'20px',fontWeight:700,verticalAlign:'middle'}}>AI</span></span>
+        </div>
+        <div className="brand-tagline">
+          Secure your code<br/>with <span className="g">AI-powered</span><br/>intelligence
         </div>
         <div className="brand-sub">
           Autonomous agent that scans, reasons,<br/>patches and verifies your code instantly.
